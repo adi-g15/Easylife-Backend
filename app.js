@@ -32,7 +32,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 
 app.use((req, res) => {
-    res.send( `Dear ${req.headers.from}, You don't have enough permissions to hit the endpoint...` )
+    res.send( `Dear ${req.headers.from}, You don't have enough permissions to hit the endpoint... - @AdiG15` )
 });
 
 app.use("/admin", adminRouter);
