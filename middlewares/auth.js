@@ -1,4 +1,5 @@
-module.exports = (req, res, next) => {
+const { authenticateJWT } = require("../utils/auth")
 
-    next();
+module.exports = (req, res, next) => {
+    authenticateJWT(req, res, next);
 }
