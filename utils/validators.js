@@ -1,5 +1,3 @@
-const { every } = require("underscore");
-
 exports.isUserNameValid = (uname) => {
 	if(  typeof uname !== "string" )	return false;
 
@@ -24,5 +22,5 @@ exports.isValidPhone = (contact) => {
 		contact = contact.split(' ').pop();	// to get last of the splitted string
 	}
 
-	return contact.length === 10 && every( contact, ch => ch >= '0' && ch <= '9' );
+	return contact.length === 10 && contact.every( (ch) => (ch => ch >= '0' && ch <= '9') );
 }

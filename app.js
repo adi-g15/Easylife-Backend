@@ -8,7 +8,9 @@ const custRouter = require("./routes/cust");
 const infoRouter = require("./routes/info");
 const cartRouter = require("./routes/cart");
 
-const { exit } = require("process")
+const { exit } = require("process");
+const { error } = require("console");
+const { notOnProduction } = require("./utils/auth");
 
 require("dotenv").config();
 
@@ -27,13 +29,26 @@ mongoose.connect( DB_URI, {
     exit(1);
 })
 
+mongoose.connection.on( "error", () => {
+    console.log("Couldn't connect to remote DB. Trying to connect to localhost...");
+
+    mongoose.connect("mongodb://localhost").then(() => {
+        console.log(`Connected to the database: ${mongoose.connection.db.databaseName}`)
+    })
+    .catch(
+        err => error(err)
+    )
+})
+
+mongoose.connection.once( "open", () => {
+    console.log(`Connected to the database: ${mongoose.connection.db.databaseName}`)
+})
+
 app.use(morgan('dev'))
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 
-app.use((req, res) => {
-    res.send( `Dear ${req.headers.from}, You don't have enough permissions to hit the endpoint... - @AdiG15` )
-});
+app.use(notOnProduction);
 
 app.use("/admin", adminRouter);
 app.use("/cart", cartRouter);
