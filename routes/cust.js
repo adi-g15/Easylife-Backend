@@ -59,9 +59,13 @@ router.post('/sign_up', (req, res) => {
 
         res.sendStatus(204);    // done :D
     })
-
 })
 
+/**
+ * @brief -> Create Samples
+ * 
+ * @note -> Will only run on non-production
+ */
 router.get('/create_sample', notOnProduction, (req, res) => {
     const list = [];
 

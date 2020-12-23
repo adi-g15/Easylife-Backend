@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const adminRouter = require("./routes/admin");
 const custRouter = require("./routes/cust");
@@ -9,7 +10,6 @@ const infoRouter = require("./routes/info");
 const cartRouter = require("./routes/cart");
 
 const { exit } = require("process");
-const { error } = require("console");
 const { notOnProduction } = require("./utils/auth");
 
 require("dotenv").config();
@@ -36,14 +36,17 @@ mongoose.connection.on( "error", () => {
         console.log(`Connected to the database: ${mongoose.connection.db.databaseName}`)
     })
     .catch(
-        err => error(err)
+        err => console.error(err)
     )
 })
 
 mongoose.connection.once( "open", () => {
-    console.log(`Connected to the database: ${mongoose.connection.db.databaseName}`)
+    console.log(`Connected to the database: ${mongoose.connection.db.databaseName}`);
 })
 
+app.use(cors({
+    methods: ["GET"],
+}))
 app.use(morgan('dev'))
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());

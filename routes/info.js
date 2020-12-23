@@ -25,6 +25,7 @@ router.get("/get_all_prices", (req, res) => {
 			return res.json({data: []});
 		}
 
+		console.log(`Sending ${docs.length} sabjis your way`);
 		return res.json({data: docs});
 	});
 });
