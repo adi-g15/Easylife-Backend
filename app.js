@@ -51,7 +51,7 @@ app.use(morgan('dev'))
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 
-app.use(notOnProduction);
+// app.use(notOnProduction);    // removing not on production from now on
 
 app.use("/admin", adminRouter);
 app.use("/cart", cartRouter);
