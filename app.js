@@ -9,7 +9,6 @@ const custRouter = require("./routes/cust");
 const infoRouter = require("./routes/info");
 const cartRouter = require("./routes/cart");
 
-const { exit } = require("process");
 const { notOnProduction } = require("./utils/auth");
 
 require("dotenv").config();
@@ -17,27 +16,26 @@ require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 const DB_URI = process.env.DB_URI || "mongodb://localhost";
 
-mongoose.connect( DB_URI, {
+const dbOptions = {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
     dbName: "easylife_dev",
     w: "majority",
-}).catch(err => {
-    console.error(`Error in DB connection: mongo DB couldn't be reached`);
-    console.error(err.code);
-    exit(1);
-})
+};
 
-mongoose.connection.on( "error", () => {
+mongoose.connect( DB_URI, dbOptions ).catch(err => {
     console.log("Couldn't connect to remote DB. Trying to connect to localhost...");
 
-    mongoose.connect("mongodb://localhost").then(() => {
-        console.log(`Connected to the database: ${mongoose.connection.db.databaseName}`)
-    })
-    .catch(
-        err => console.error(err)
-    )
+    mongoose.connect("mongodb://localhost", dbOptions)
+                .catch(
+                    err => console.error(err)
+                )
+})
+
+mongoose.connection.on( "error", (err) => {
+    console.error(`Error in DB connection: mongo DB couldn't be reached`);
+    console.error(err.code);
 })
 
 mongoose.connection.once( "open", () => {
@@ -47,6 +45,7 @@ mongoose.connection.once( "open", () => {
 app.use(cors({
     methods: ["GET"],
 }))
+
 app.use(morgan('dev'))
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
