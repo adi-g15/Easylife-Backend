@@ -1,10 +1,37 @@
 const router = require("express").Router();
 const sabjiModel = require("../models/schemas/sabji");
+const offerModel = require("../models/schemas/offers");
 
 /**
  * @important @note -> Only the routes that return prices, are required now, likely what desription will you give at frontend regarding a vegetable, so that is less important, implement later only if needed
  * 
  */
+
+/**
+ * @brief - Get LIST of ALL offers
+ * 
+ * @auth -> NOT REQUIRED
+ */
+router.get("/get_offers", (req, res) => {
+	offerModel.find({}).lean()
+		.then((offers) => {
+			if( !offers || offers.length===0 ){
+				console.error("No offers available 😢");
+
+				return res.json({data: []});
+			}
+
+			console.log(`Sending ${offers.length} offers 🎉`);
+			return res.json({data: offers});		
+		})
+		.catch(err => {
+			// error
+			console.error(err);
+
+			return res.sendStatus(500);		
+		})
+});
+
 
 /**
  * @brief - Get LIST of ALL products AND their prices

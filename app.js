@@ -13,7 +13,7 @@ const { notOnProduction } = require("./utils/auth");
 
 require("dotenv").config();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const DB_URI = process.env.DB_URI || "mongodb://localhost";
 
 const dbOptions = {
