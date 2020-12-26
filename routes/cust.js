@@ -29,9 +29,11 @@ router.post('/login', (req, res) => {
                     })
                 })
                 .catch(err => {
-                    console.error(err.msg || err);
+                    console.error( uname, err.msg || err);
 
-                    res.sendStatus( err.status || 500); // can be 401 too
+                    err.status !== 500 ? 
+                        res.status(err.status).send({msg: err.msg}):
+                        res.sendStatus(500)
                 })
 })
 
@@ -65,7 +67,7 @@ router.post('/sign_up', (req, res) => {
                 // ie. duplicate key
 
                 console.log(`Duplicate Key; Couldn't save user - `, user);
-                return res.status(403).send({msg: "You may already have an account here. Try logging in..."});
+                return res.status(403).send({code: 11000, msg: "You may already have an account here. Try logging in..."});
             }
 
             console.error(`(${err.code}) Couldn't save user - `, user);

@@ -68,14 +68,14 @@ customer.pre("save", function (next) {
 
 customer.statics.authenticate = (uname, pass) => (
 	new Promise((resolve, reject) => {
-		custModel.findOne({ name: uname }, (err, doc) => {
+		custModel.findOne({ uname }, (err, doc) => {
 			if (err) {
 				return reject(err);
 			} else if (!doc) {
 				//couldn't find a matching document
-				err = { msg: `User ${uname} Not Found` };
+				err = { msg: `User Not Found` };
 				err.status = 401;
-	
+
 				return reject(err);
 			}
 
