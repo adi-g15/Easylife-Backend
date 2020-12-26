@@ -34,8 +34,7 @@ mongoose.connect( DB_URI, dbOptions ).catch(err => {
 })
 
 mongoose.connection.on( "error", (err) => {
-    console.error(`Error in DB connection: mongo DB couldn't be reached`);
-    console.error(err.code);
+    console.error(`[${err.code}] There was an error in DB connection: mongo DB couldn't be reached`);
 })
 
 mongoose.connection.once( "open", () => {

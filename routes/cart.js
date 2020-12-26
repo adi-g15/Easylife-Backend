@@ -9,7 +9,7 @@ const sabjiModel = require("../models/schemas/sabji");
  * @note -> The list received here, if has same values will be considered for the purchase ONLY (not the client side's that can have problems)
  * 
  */
-router.post('/cartSubmit', authWare,(req, res) => {
+router.post('/submit', authWare,(req, res) => {
     const sabji_list = req.body.sabji_ids;
     // const client_total = req.body.total; // this is also expected to be inside the body of cart
 
@@ -47,15 +47,15 @@ router.post('/cartSubmit', authWare,(req, res) => {
  * 
  * @response -> If success, then returns a number representing cart total
  */
-router.post('/getCartTotal', authWare,(req, res) => {
-    const sabji_list = req.body.sabji;
+router.post('/getTotal', authWare,(req, res) => {
+    const sabji_list = req.body.sabji_ids;
     // const client_total = req.body.total; // this is also expected to be inside the body of cart
 
     if( !Array.isArray(sabji_list) ){
         return res.sendState(401);  // invalid data, sabji list not sent !!
     }
 
-    getCartTotal(sabji_list)
+    getCartTotal(sabji_list, true)
         .then( (resultObj) => {
 
             if( resultObj.total != req.body.total ){

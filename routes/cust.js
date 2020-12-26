@@ -9,19 +9,23 @@ const { random16BaseString, randomBinaryString } = require("../utils/random");
 /**
  * @brief -> Login Route
  * 
- * @req body -> {name, pass}
+ * @req body -> {uname, pass}
  * 
  * @cmd - curl -X POST localhost:3000/cust/login -H "Content-Type: application/json" -d @data.json
  */
 router.post('/login', (req, res) => {
-    const { name, pass } = req.body;
+    const { uname, pass } = req.body;
 
-    custModel.authenticate( name, pass )
-                .then(() => {   // doc not required here
+    custModel.authenticate( uname, pass )
+                .then((user) => {
                     res.json({
+                        user: {
+                            uname: user.uname,
+                            contact: user.email || user.mobile
+                        },
                         token: jwt.sign({
-                                    uid: name,  // no scopes for now
-                               }, jwt_sec_token)
+                            uid: uname,  // no scopes for now
+                        }, jwt_sec_token)
                     })
                 })
                 .catch(err => {
@@ -32,15 +36,19 @@ router.post('/login', (req, res) => {
 })
 
 /**
- * @brief -> Sign Up Route
+ * @brief -> Sign Up Route (NOTE-> BOTH login and signup routes will respond with a token when it worked well)
  * 
- * @req body -> {name, pass, contact}
+ * @req body -> {uname, pass, contact}
  */
 router.post('/sign_up', (req, res) => {
 
     const user = {
-        name: req.body.name,
-        pass: req.body.pass // this MUST be transported on secure network
+        pass: req.body.pass
+         // this MUST be transported on secure network
+    }
+
+    if( !req.body.uname ){  // if uname and contact were same, client side only sends the contact... so we consider uname will be same as contact
+        user.uname = req.body.contact;
     }
 
     if( isValidPhone(req.body.contact) ){
@@ -48,16 +56,32 @@ router.post('/sign_up', (req, res) => {
     }else if( isValidEmail(req.body.contact) ) {
         user.email = req.body.contact;
     }else{
-        return res.status(500).send({err: 'Contact invalid'});  // @todo -> Use correct status code for invalid data received
+        return res.status(401).send({err: 'Contact invalid'});  // @todo -> Use correct status code for invalid data received
     }
 
     custModel.create( user, (err) => {  // doc not needed to use in callback
         if(err) {
-            console.error(`(${err.code})Couldn't save user - `, user);
+            if(err.code === 11000) {
+                // ie. duplicate key
+
+                console.log(`Duplicate Key; Couldn't save user - `, user);
+                return res.status(403).send({msg: "You may already have an account here. Try logging in..."});
+            }
+
+            console.error(`(${err.code}) Couldn't save user - `, user);
             return res.sendStatus(500);
         }
 
-        res.sendStatus(204);    // done :D
+        // return token
+        res.json({
+            user: {
+                uname: user.uname,
+                contact: user.email || user.mobile
+            },
+            token: jwt.sign({
+                        uid: user.uname,  // no scopes for now
+                   }, jwt_sec_token)
+        });
     })
 })
 

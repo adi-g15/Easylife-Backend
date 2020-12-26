@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 // @note - this model will change according to the one used by signup backend team, according to how the info is originally stored
 const customer = Schema({
-	name: {
+	uname: {
 		type: String,
 		trim: true,
 		unique: true,
@@ -20,13 +20,24 @@ const customer = Schema({
 	mobile: {
 		type: Number,
 		unique: true,
+		// BUT, ALLOW NULL values
 	},
 	pass: {
 		type: String,
 		required: true,
 		alias: "password", // not stored on db
 	},
+	firstName: {
+		
+	},
+	surname: {
+		
+	},
 });
+
+customer.virtual('fullName').get(function() {
+	return this.firstName +  ' ' + this.surname;
+})
 
 customer.pre("save", function (next) {
 	if (!this.email && !this.mobile) {
