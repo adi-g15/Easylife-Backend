@@ -39,22 +39,27 @@ router.get("/get_offers", (req, res) => {
  * @auth -> NOT REQUIRED
  */
 router.get("/get_all_prices", (req, res) => {
-	sabjiModel.find({}, 'name price unit desc not_avail', (err, docs) => {
-		if( err ){
-			// error
-			console.error(err);
+	sabjiModel.find({})
+				.where('not_avail').equals(false)
+				.select('-not_avail')
+				.lean()
+					.then(docs => {
+						if( !docs || docs.length===0 ){
+							console.error("No sabji available");
 
-			return res.sendStatus(500);
-		}
-		else if( !docs || docs.length===0 ){
-			console.error("No sabji avaialable");
+							return res.json({data: []});
+						}
 
-			return res.json({data: []});
-		}
+						console.log(`Sending ${docs.length} sabjis your way 🍅`);
 
-		console.log(`Sending ${docs.length} sabjis your way`);
-		return res.json({data: docs});
-	});
+						return res.json({data: docs});
+					})
+					.catch(err => {
+						// error
+						console.error(err);
+
+						return res.sendStatus(500);
+					})
 });
 
 /**
@@ -65,24 +70,26 @@ router.get("/get_all_prices", (req, res) => {
  * @auth -> NOT REQUIRED
  */
 router.get("/get_price/:prod_id", (req, res) => {
-	sabjiModel.findOneById(req.params.prod_id, 'price', (err, doc) => {
-		if( err ){
-			// error
-			console.error(err);
+	sabjiModel.findOneById( req.params.prod_id )
+				.select('price')
+				.then(doc => {
+					if( !doc ){
+						console.error(`Sabji with id: ${req.params.prod_id} not found`);
 
-			return res.sendStatus(500);
-		}
-		else if( !doc ){
-			console.error(`Sabji with id: ${req.params.prod_id} not found`);
+						return res.sendStatus(204);	// nothing to send, sabji NOT FOUND
+						/**
+						 * @note -> In this case, client side should remove the sabji for which this API was called,since there may be some changes made to database later
+						 */
+					}
 
-			return res.sendStatus(204);	// nothing to send, sabji NOT FOUND
-			/**
-			 * @note -> In this case, client side should remove the sabji for which this API was called,since there may be some changes made to database later
-			 */
-		}
+					return res.json({price: doc.price});
+				})
+				.catch(err => {
+							// error
+							console.error(err);
 
-		return res.json({price: doc.price});
-	});
+							return res.sendStatus(500);
+				})
 });
 
 /**
