@@ -51,6 +51,8 @@ router.post('/sign_up', (req, res) => {
 
     if( !req.body.uname ){  // if uname and contact were same, client side only sends the contact... so we consider uname will be same as contact
         user.uname = req.body.contact;
+    } else {
+        user.uname = req.body.uname;
     }
 
     if( isValidPhone(req.body.contact) ){

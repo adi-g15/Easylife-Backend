@@ -22,5 +22,5 @@ exports.isValidPhone = (contact) => {
 		contact = contact.split(' ').pop();	// to get last of the splitted string
 	}
 
-	return contact.length === 10 && contact.every( (ch) => (ch => ch >= '0' && ch <= '9') );
+	return /^(\d){10}$/.test(contact);	// if 10 numerical digits or not
 }

@@ -16,10 +16,12 @@ const customer = Schema({
 		// email or mobile one of them should be required
 		type: String,
 		unique: true,
+		sparse: true,
 	},
 	mobile: {
 		type: Number,
 		unique: true,
+		sparse: true
 		// BUT, ALLOW NULL values
 	},
 	pass: {
